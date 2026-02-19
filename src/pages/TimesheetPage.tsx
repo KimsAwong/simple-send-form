@@ -13,6 +13,7 @@ import { useTimesheets, useCreateTimesheet, useUpdateTimesheetStatus } from "@/h
 import type { Database } from "@/integrations/supabase/types";
 import { useAllProfiles } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
+import { mapErrorToUserMessage } from "@/lib/error-utils";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -99,7 +100,7 @@ export default function TimesheetPage() {
       setTaskDescription('');
       setSelectedWorkerId('');
     } catch (err: any) {
-      toast({ title: "Error submitting timesheet", description: err.message, variant: "destructive" });
+      toast({ title: "Error submitting timesheet", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 
@@ -108,7 +109,7 @@ export default function TimesheetPage() {
       await updateStatus.mutateAsync({ id, status, approvedBy: user?.id });
       toast({ title: `Timesheet ${status}` });
     } catch (err: any) {
-      toast({ title: "Error updating timesheet", description: err.message, variant: "destructive" });
+      toast({ title: "Error updating timesheet", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 

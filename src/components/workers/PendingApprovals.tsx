@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CheckCircle, XCircle, UserCheck, Trash2, Loader2 } from "lucide-react";
 import { usePendingApprovals, useApproveAccount } from "@/hooks/useAccountApprovals";
 import { useToast } from "@/hooks/use-toast";
+import { mapErrorToUserMessage } from "@/lib/error-utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -22,7 +23,7 @@ export function PendingApprovals() {
       await approveAccount.mutateAsync({ approvalId, userId, status });
       toast({ title: `Account ${status}` });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 
@@ -39,7 +40,7 @@ export function PendingApprovals() {
       queryClient.invalidateQueries({ queryKey: ['account-approvals'] });
       queryClient.invalidateQueries({ queryKey: ['profiles'] });
     } catch (err: any) {
-      toast({ title: "Error deleting account", description: err.message, variant: "destructive" });
+      toast({ title: "Error deleting account", description: mapErrorToUserMessage(err), variant: "destructive" });
     } finally {
       setDeletingId(null);
     }

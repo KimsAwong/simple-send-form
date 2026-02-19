@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFinancialTransactions, useCreateTransaction, useFinancialSummary } from "@/hooks/useFinancials";
 import { usePayslips } from "@/hooks/usePayslips";
 import { useToast } from "@/hooks/use-toast";
+import { mapErrorToUserMessage } from "@/lib/error-utils";
 
 export default function AccountsPage() {
   const { user, primaryRole } = useAuth();
@@ -63,7 +64,7 @@ export default function AccountsPage() {
         transaction_date: new Date().toISOString().split('T')[0],
       });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 

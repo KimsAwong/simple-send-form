@@ -9,6 +9,7 @@ import { ClipboardList, Send, Loader2, CheckCircle, AlertCircle } from "lucide-r
 import { useAuth } from "@/contexts/AuthContext";
 import { useWorkSummaries, useCreateWorkSummary, useReviewWorkSummary, getCurrentFortnightPeriod } from "@/hooks/useWorkSummaries";
 import { useToast } from "@/hooks/use-toast";
+import { mapErrorToUserMessage } from "@/lib/error-utils";
 
 interface WorkSummarySectionProps {
   workerId?: string;
@@ -56,7 +57,7 @@ export function WorkSummarySection({ workerId, showForm = false }: WorkSummarySe
       setChallenges('');
       setGoals('');
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 
@@ -66,7 +67,7 @@ export function WorkSummarySection({ workerId, showForm = false }: WorkSummarySe
       await reviewSummary.mutateAsync({ id: summaryId, status, reviewedBy: user.id });
       toast({ title: `Summary ${status}` });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 

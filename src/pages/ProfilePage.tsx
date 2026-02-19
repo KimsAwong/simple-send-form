@@ -14,6 +14,7 @@ import { useTimesheets } from "@/hooks/useTimesheets";
 import { usePayslips } from "@/hooks/usePayslips";
 import { useContracts } from "@/hooks/useContracts";
 import { useToast } from "@/hooks/use-toast";
+import { mapErrorToUserMessage } from "@/lib/error-utils";
 import { WorkSummarySection } from "@/components/workers/WorkSummarySection";
 
 export default function ProfilePage() {
@@ -81,7 +82,7 @@ export default function ProfilePage() {
       toast({ title: "Profile updated" });
       setEditingProfile(false);
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 
@@ -106,7 +107,7 @@ export default function ProfilePage() {
       toast({ title: "Bank details saved" });
       setEditingBank(false);
     } catch (err: any) {
-      toast({ title: "Error saving bank details", description: err.message, variant: "destructive" });
+      toast({ title: "Error saving bank details", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 
