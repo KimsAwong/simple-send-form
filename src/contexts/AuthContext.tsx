@@ -16,6 +16,8 @@ interface AuthContextType extends AuthState {
   isCEO: boolean;
   isSupervisor: boolean;
   isWorker: boolean;
+  isPayrollOfficer: boolean;
+  isFinance: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,9 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           manager: 'ceo',
           admin: 'ceo',
           supervisor: 'supervisor',
+          payroll_officer: 'payroll_officer',
+          accountant: 'finance',
           hr: 'supervisor',
-          finance: 'supervisor',
-          accountant: 'supervisor',
           worker: 'worker',
           employee: 'worker',
         };
@@ -66,14 +68,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
         setIsEmailVerified(!!session?.user?.email_confirmed_at);
         
         if (session?.user) {
-          // Use setTimeout to avoid potential deadlock with Supabase client
           setTimeout(() => fetchProfile(session.user.id), 0);
         } else {
           setUser(null);
@@ -83,7 +83,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setIsEmailVerified(!!session?.user?.email_confirmed_at);
@@ -104,10 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         data: { full_name: fullName, phone },
       },
     });
-
-    const needsVerification = false;
-
-    return { error, needsVerification };
+    return { error, needsVerification: false };
   };
 
   const signIn = async (email: string, password: string) => {
@@ -131,9 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updatePassword = async (newPassword: string) => {
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
     return { error };
   };
 
@@ -144,15 +138,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Determine primary role (highest privilege)
-  const rolePriority: UserRole[] = ['ceo', 'supervisor', 'worker'];
+  const rolePriority: UserRole[] = ['ceo', 'payroll_officer', 'finance', 'supervisor', 'worker'];
   const primaryRole = rolePriority.find(r => roles.includes(r)) || 'worker';
 
   const isApproved = user?.account_status === 'approved';
 
-  // Role helpers for UI
   const isCEO = roles.includes('ceo');
   const isSupervisor = roles.includes('supervisor');
   const isWorker = roles.includes('worker');
+  const isPayrollOfficer = roles.includes('payroll_officer');
+  const isFinance = roles.includes('finance') || roles.includes('payroll_officer');
 
   return (
     <AuthContext.Provider
@@ -168,6 +163,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isCEO,
         isSupervisor,
         isWorker,
+        isPayrollOfficer,
+        isFinance,
         signUp,
         signIn,
         signOut,

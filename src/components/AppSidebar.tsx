@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, Calculator, FileText, MessageSquare,
-  LogOut, UserCircle, Receipt, History, BarChart3
+  LogOut, UserCircle, Receipt, History, BarChart3, Banknote, Clock, ClipboardCheck
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,16 +10,30 @@ import {
   SidebarFooter, SidebarHeader,
 } from "@/components/ui/sidebar";
 
-
-// Role-based navigation definitions
 const ceoNav = [
   { title: "CEO Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Manage Supervisors", url: "/workers", icon: Users },
-  { title: "All Employees", url: "/workers", icon: Users },
-  { title: "Payroll Wizard", url: "/payroll-wizard", icon: Calculator },
+  { title: "Manage Staff", url: "/workers", icon: Users },
+  { title: "Payroll Approval", url: "/payroll-wizard", icon: ClipboardCheck },
   { title: "Payroll History", url: "/payroll-history", icon: History },
   { title: "Attendance Overview", url: "/attendance-overview", icon: FileText },
   { title: "Reports", url: "/reports", icon: BarChart3 },
+  { title: "Chat", url: "/chat", icon: MessageSquare },
+];
+
+const payrollOfficerNav = [
+  { title: "Payroll Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Process Payroll", url: "/payroll-wizard", icon: Calculator },
+  { title: "All Timesheets", url: "/attendance-overview", icon: Clock },
+  { title: "Payroll History", url: "/payroll-history", icon: History },
+  { title: "All Workers", url: "/workers", icon: Users },
+  { title: "Chat", url: "/chat", icon: MessageSquare },
+];
+
+const financeNav = [
+  { title: "Finance Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Process Payments", url: "/payroll-wizard", icon: Banknote },
+  { title: "Payroll History", url: "/payroll-history", icon: History },
+  { title: "All Workers", url: "/workers", icon: Users },
   { title: "Chat", url: "/chat", icon: MessageSquare },
 ];
 
@@ -35,19 +49,30 @@ const workerNav = [
   { title: "My Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "My Profile", url: "/my-profile", icon: UserCircle },
   { title: "Clock In/Out", url: "/attendance", icon: FileText },
-  { title: "Attendance History", url: "/attendance", icon: History },
   { title: "My Payslips", url: "/my-payslips", icon: Receipt },
   { title: "Payment History", url: "/payment-history", icon: History },
   { title: "Chat", url: "/chat", icon: MessageSquare },
 ];
 
+const roleLabel: Record<string, string> = {
+  ceo: 'CEO',
+  payroll_officer: 'Payroll Officer',
+  finance: 'Finance',
+  supervisor: 'Supervisor',
+  worker: 'Worker',
+};
 
 export function AppSidebar() {
   const { user, primaryRole, signOut } = useAuth();
+  
   let navItems;
-  if (primaryRole === 'ceo') navItems = ceoNav;
-  else if (primaryRole === 'supervisor') navItems = supervisorNav;
-  else navItems = workerNav;
+  switch (primaryRole) {
+    case 'ceo': navItems = ceoNav; break;
+    case 'payroll_officer': navItems = payrollOfficerNav; break;
+    case 'finance': navItems = financeNav; break;
+    case 'supervisor': navItems = supervisorNav; break;
+    default: navItems = workerNav;
+  }
 
   return (
     <Sidebar className="border-r-0">
@@ -66,7 +91,7 @@ export function AppSidebar() {
       <SidebarContent className="px-2 py-3">
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/40 text-[10px] uppercase tracking-widest px-3 mb-1">
-            {primaryRole === 'ceo' ? "CEO" : primaryRole === 'supervisor' ? "Supervisor" : "Worker"}
+            {roleLabel[primaryRole] || 'Worker'}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

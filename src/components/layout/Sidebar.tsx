@@ -39,6 +39,21 @@ const menuItems: Record<UserRole, { icon: React.ReactNode; label: string; path: 
     { icon: <MessageCircle size={20} />, label: "Messages", path: "/chat" },
     { icon: <User size={20} />, label: "My Profile", path: "/my-profile" },
   ],
+  payroll_officer: [
+    { icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/dashboard" },
+    { icon: <Wallet size={20} />, label: "Process Payroll", path: "/payroll-wizard" },
+    { icon: <Clock size={20} />, label: "All Timesheets", path: "/attendance-overview" },
+    { icon: <FileText size={20} />, label: "Payroll History", path: "/payroll-history" },
+    { icon: <Users size={20} />, label: "Workers", path: "/workers" },
+    { icon: <MessageCircle size={20} />, label: "Messages", path: "/chat" },
+  ],
+  finance: [
+    { icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/dashboard" },
+    { icon: <Wallet size={20} />, label: "Process Payments", path: "/payroll-wizard" },
+    { icon: <FileText size={20} />, label: "Payment History", path: "/payroll-history" },
+    { icon: <Users size={20} />, label: "Workers", path: "/workers" },
+    { icon: <MessageCircle size={20} />, label: "Messages", path: "/chat" },
+  ],
   ceo: [
     { icon: <LayoutDashboard size={20} />, label: "Overview", path: "/dashboard" },
     { icon: <BarChart3 size={20} />, label: "Analytics", path: "/reports" },

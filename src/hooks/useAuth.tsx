@@ -16,6 +16,6 @@ export function useAuth() {
           avatar_url: auth.user.avatar_url ?? null,
         }
       : null,
-    isStaff: auth.roles.some((role) => role === "ceo" || role === "supervisor"),
+    isStaff: auth.roles.some((role) => role === "ceo" || role === "supervisor" || role === "payroll_officer" || role === "finance"),
   };
 }
