@@ -147,16 +147,19 @@ export async function generateAndStorePayslipPdf({
 
   const generatorModule = await import(/* @vite-ignore */ "@pdfme/generator");
   const pdf = await generatorModule.generate({ template, inputs });
-  const fileName = `payslip-${payslip.worker_id}-${payslip.period_start}-${payslip.period_end}.pdf`;
-  const path = `generated/${fileName}`;
+  const fileName = `payslip-${payslip.period_start}-${payslip.period_end}.pdf`;
+  const path = `generated/${payslip.worker_id}/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from("payslips")
     .upload(path, pdf, { contentType: "application/pdf", upsert: true });
   if (uploadError) throw uploadError;
 
-  const { data } = supabase.storage.from("payslips").getPublicUrl(path);
-  return data.publicUrl;
+  const { data, error: signedUrlError } = await supabase.storage
+    .from("payslips")
+    .createSignedUrl(path, 3600); // 1 hour expiry
+  if (signedUrlError) throw signedUrlError;
+  return data.signedUrl;
 }
 
 export function formatKina(amount: number) {
