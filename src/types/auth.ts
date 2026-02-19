@@ -1,4 +1,4 @@
-export type UserRole = 'ceo' | 'supervisor' | 'worker';
+export type UserRole = 'ceo' | 'supervisor' | 'worker' | 'payroll_officer' | 'finance';
 export type EmploymentType = 'permanent' | 'temporary';
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
 

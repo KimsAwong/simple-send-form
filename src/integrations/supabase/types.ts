@@ -277,9 +277,102 @@ export type Database = {
           },
         ]
       }
+      payroll_cycles: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          paid_by: string | null
+          period_end: string
+          period_start: string
+          status: Database["public"]["Enums"]["payroll_cycle_status"]
+          total_deductions: number
+          total_gross: number
+          total_net: number
+          total_workers: number
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          paid_by?: string | null
+          period_end: string
+          period_start: string
+          status?: Database["public"]["Enums"]["payroll_cycle_status"]
+          total_deductions?: number
+          total_gross?: number
+          total_net?: number
+          total_workers?: number
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          paid_by?: string | null
+          period_end?: string
+          period_start?: string
+          status?: Database["public"]["Enums"]["payroll_cycle_status"]
+          total_deductions?: number
+          total_gross?: number
+          total_net?: number
+          total_workers?: number
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_cycles_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_cycles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_cycles_paid_by_fkey"
+            columns: ["paid_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_cycles_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payslips: {
         Row: {
           created_at: string
+          cycle_id: string | null
           deductions: number
           generated_by: string | null
           gross_pay: number
@@ -298,6 +391,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          cycle_id?: string | null
           deductions?: number
           generated_by?: string | null
           gross_pay?: number
@@ -316,6 +410,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          cycle_id?: string | null
           deductions?: number
           generated_by?: string | null
           gross_pay?: number
@@ -333,6 +428,13 @@ export type Database = {
           worker_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "payslips_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_cycles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payslips_generated_by_fkey"
             columns: ["generated_by"]
@@ -593,6 +695,8 @@ export type Database = {
       }
       is_accountant: { Args: { _user_id: string }; Returns: boolean }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_finance: { Args: { _user_id: string }; Returns: boolean }
+      is_payroll_officer: { Args: { _user_id: string }; Returns: boolean }
       is_supervisor_of: {
         Args: { _supervisor_id: string; _worker_id: string }
         Returns: boolean
@@ -608,6 +712,12 @@ export type Database = {
         | "payroll_officer"
       approval_status: "pending" | "approved" | "rejected"
       employment_type: "permanent" | "temporary"
+      payroll_cycle_status:
+        | "draft"
+        | "verification"
+        | "pending_approval"
+        | "approved"
+        | "paid"
       payslip_status: "draft" | "generated" | "paid"
       timesheet_status: "pending" | "approved" | "flagged" | "rejected"
       transaction_type:
@@ -753,6 +863,13 @@ export const Constants = {
       ],
       approval_status: ["pending", "approved", "rejected"],
       employment_type: ["permanent", "temporary"],
+      payroll_cycle_status: [
+        "draft",
+        "verification",
+        "pending_approval",
+        "approved",
+        "paid",
+      ],
       payslip_status: ["draft", "generated", "paid"],
       timesheet_status: ["pending", "approved", "flagged", "rejected"],
       transaction_type: [

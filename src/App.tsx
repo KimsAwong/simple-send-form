@@ -41,19 +41,15 @@ export default function App() {
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
-                    <WithLayout>
-                      <Dashboard />
-                    </WithLayout>
+                    <WithLayout><Dashboard /></WithLayout>
                   </ProtectedRoute>
                 }
               />
               <Route
                 path="/workers"
                 element={
-                  <ProtectedRoute allowedRoles={["ceo", "supervisor"]}>
-                    <WithLayout>
-                      <WorkersPage />
-                    </WithLayout>
+                  <ProtectedRoute allowedRoles={["ceo", "supervisor", "payroll_officer", "finance"]}>
+                    <WithLayout><WorkersPage /></WithLayout>
                   </ProtectedRoute>
                 }
               />
@@ -61,9 +57,7 @@ export default function App() {
                 path="/attendance"
                 element={
                   <ProtectedRoute>
-                    <WithLayout>
-                      <AttendancePage />
-                    </WithLayout>
+                    <WithLayout><AttendancePage /></WithLayout>
                   </ProtectedRoute>
                 }
               />
@@ -71,39 +65,31 @@ export default function App() {
                 path="/supervisor-attendance"
                 element={
                   <ProtectedRoute allowedRoles={["supervisor"]}>
-                    <WithLayout>
-                      <SupervisorAttendance />
-                    </WithLayout>
+                    <WithLayout><SupervisorAttendance /></WithLayout>
                   </ProtectedRoute>
                 }
               />
               <Route
                 path="/attendance-overview"
                 element={
-                  <ProtectedRoute allowedRoles={["ceo"]}>
-                    <WithLayout>
-                      <AttendanceOverview />
-                    </WithLayout>
+                  <ProtectedRoute allowedRoles={["ceo", "payroll_officer", "finance"]}>
+                    <WithLayout><AttendanceOverview /></WithLayout>
                   </ProtectedRoute>
                 }
               />
               <Route
                 path="/payroll-wizard"
                 element={
-                  <ProtectedRoute allowedRoles={["ceo"]}>
-                    <WithLayout>
-                      <PayrollWizard />
-                    </WithLayout>
+                  <ProtectedRoute allowedRoles={["ceo", "payroll_officer", "finance"]}>
+                    <WithLayout><PayrollWizard /></WithLayout>
                   </ProtectedRoute>
                 }
               />
               <Route
                 path="/payroll-history"
                 element={
-                  <ProtectedRoute allowedRoles={["ceo"]}>
-                    <WithLayout>
-                      <PayrollHistory />
-                    </WithLayout>
+                  <ProtectedRoute allowedRoles={["ceo", "payroll_officer", "finance"]}>
+                    <WithLayout><PayrollHistory /></WithLayout>
                   </ProtectedRoute>
                 }
               />
@@ -111,9 +97,7 @@ export default function App() {
                 path="/reports"
                 element={
                   <ProtectedRoute allowedRoles={["ceo"]}>
-                    <WithLayout>
-                      <CEOAnalytics />
-                    </WithLayout>
+                    <WithLayout><CEOAnalytics /></WithLayout>
                   </ProtectedRoute>
                 }
               />
@@ -121,9 +105,7 @@ export default function App() {
                 path="/my-payslips"
                 element={
                   <ProtectedRoute>
-                    <WithLayout>
-                      <PayslipsPage />
-                    </WithLayout>
+                    <WithLayout><PayslipsPage /></WithLayout>
                   </ProtectedRoute>
                 }
               />
@@ -131,9 +113,7 @@ export default function App() {
                 path="/payment-history"
                 element={
                   <ProtectedRoute>
-                    <WithLayout>
-                      <PaymentHistoryPage />
-                    </WithLayout>
+                    <WithLayout><PaymentHistoryPage /></WithLayout>
                   </ProtectedRoute>
                 }
               />
@@ -141,9 +121,7 @@ export default function App() {
                 path="/my-profile"
                 element={
                   <ProtectedRoute>
-                    <WithLayout>
-                      <ProfilePage />
-                    </WithLayout>
+                    <WithLayout><ProfilePage /></WithLayout>
                   </ProtectedRoute>
                 }
               />
@@ -151,9 +129,7 @@ export default function App() {
                 path="/chat"
                 element={
                   <ProtectedRoute>
-                    <WithLayout>
-                      <ChatPage />
-                    </WithLayout>
+                    <WithLayout><ChatPage /></WithLayout>
                   </ProtectedRoute>
                 }
               />
