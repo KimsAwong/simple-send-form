@@ -2,6 +2,7 @@ import {
   LayoutDashboard, Users, Calculator, FileText, MessageSquare,
   LogOut, UserCircle, Receipt, History, BarChart3, Banknote, Clock, ClipboardCheck
 } from "lucide-react";
+import companyLogo from "@/assets/company-logo.png";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -78,9 +79,7 @@ export function AppSidebar() {
     <Sidebar className="border-r-0">
       <SidebarHeader className="p-4 border-b border-sidebar-border">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
-            <span className="text-sidebar-primary-foreground font-bold text-sm">KW</span>
-          </div>
+          <img src={companyLogo} alt="KaiaWorks" className="h-8 w-auto object-contain rounded" />
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-sidebar-foreground">KaiaWorks</span>
             <span className="text-[10px] text-sidebar-foreground/60 uppercase tracking-wider">Auto PayRoll</span>

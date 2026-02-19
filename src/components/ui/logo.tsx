@@ -1,4 +1,4 @@
-import kaiaworksLogo from "@/assets/kaiaworks-logo.png";
+import companyLogo from "@/assets/company-logo.png";
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -15,16 +15,16 @@ export function Logo({ size = 'md', showText = true }: LogoProps) {
   return (
     <div className="flex items-center gap-3">
       <img 
-        src={kaiaworksLogo} 
+        src={companyLogo} 
         alt="KAIAWORKS Logo" 
         className={`${sizeClasses[size]} w-auto object-contain`}
       />
       {showText && (
         <div className="flex flex-col">
           <span className="font-display font-bold text-lg leading-tight text-foreground">
-            WorkFlow
+            KaiaWorks
           </span>
-          <span className="text-xs font-semibold text-primary">PNG</span>
+          <span className="text-xs font-semibold text-primary">Auto PayRoll</span>
         </div>
       )}
     </div>
