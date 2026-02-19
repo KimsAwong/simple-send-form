@@ -46,6 +46,8 @@ export default function ChatPage() {
           senderId: user.id,
           receiverId: user.id,
           content: message.trim(),
+          isBroadcast: true,
+          broadcastRole: broadcastRole as "ceo" | "manager" | "supervisor" | "worker" | "accountant",
         });
         setMessage('');
         setBroadcastRole('');

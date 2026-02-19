@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useContracts, useCreateContract, useDeactivateContract } from "@/hooks/useContracts";
 import { useAllProfiles } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
+import { mapErrorToUserMessage } from "@/lib/error-utils";
 
 export default function ContractsPage() {
   const { user, primaryRole } = useAuth();
@@ -53,7 +54,7 @@ export default function ContractsPage() {
       setDialogOpen(false);
       setForm({ worker_id: '', start_date: '', end_date: '', description: '', hourly_rate: '', daily_rate: '' });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 
@@ -62,7 +63,7 @@ export default function ContractsPage() {
       await deactivateContract.mutateAsync(id);
       toast({ title: "Contract deactivated" });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 

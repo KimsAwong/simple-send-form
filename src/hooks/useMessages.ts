@@ -2,6 +2,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database["public"]["Enums"]["app_role"];
 
 export function useContacts() {
   const { user } = useAuth();
@@ -60,14 +63,29 @@ export function useConversation(contactId: string | null) {
 export function useSendMessage() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ senderId, receiverId, content }: {
+    mutationFn: async ({ senderId, receiverId, content, isBroadcast, broadcastRole }: {
       senderId: string;
       receiverId: string;
       content: string;
+      isBroadcast?: boolean;
+      broadcastRole?: AppRole;
     }) => {
+      const insertData = isBroadcast
+        ? {
+            sender_id: senderId,
+            receiver_id: null,
+            content,
+            is_broadcast: true,
+            broadcast_to_role: broadcastRole,
+          }
+        : {
+            sender_id: senderId,
+            receiver_id: receiverId,
+            content,
+          };
       const { data, error } = await supabase
         .from('messages')
-        .insert([{ sender_id: senderId, receiver_id: receiverId, content }])
+        .insert([insertData])
         .select()
         .single();
       if (error) throw error;

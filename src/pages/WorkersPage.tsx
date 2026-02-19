@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAllProfiles } from "@/hooks/useProfile";
 import type { Database } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
+import { mapErrorToUserMessage } from "@/lib/error-utils";
 import { PendingApprovals } from "@/components/workers/PendingApprovals";
 import { WorkerDetailPanel } from "@/components/workers/WorkerDetailPanel";
 import { WorkSummarySection } from "@/components/workers/WorkSummarySection";
@@ -112,7 +113,7 @@ function FortnightlySummaryReview() {
       await reviewSummary.mutateAsync({ id: summaryId, status, reviewedBy: user.id });
       toast({ title: `Summary ${status}` });
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: "Error", description: mapErrorToUserMessage(err), variant: "destructive" });
     }
   };
 
