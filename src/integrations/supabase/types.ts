@@ -599,7 +599,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "ceo" | "manager" | "supervisor" | "worker" | "accountant"
+      app_role:
+        | "ceo"
+        | "manager"
+        | "supervisor"
+        | "worker"
+        | "accountant"
+        | "payroll_officer"
       approval_status: "pending" | "approved" | "rejected"
       employment_type: "permanent" | "temporary"
       payslip_status: "draft" | "generated" | "paid"
@@ -737,7 +743,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["ceo", "manager", "supervisor", "worker", "accountant"],
+      app_role: [
+        "ceo",
+        "manager",
+        "supervisor",
+        "worker",
+        "accountant",
+        "payroll_officer",
+      ],
       approval_status: ["pending", "approved", "rejected"],
       employment_type: ["permanent", "temporary"],
       payslip_status: ["draft", "generated", "paid"],
