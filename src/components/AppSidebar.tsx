@@ -48,10 +48,8 @@ const supervisorNav = [
 
 const workerNav = [
   { title: "My Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "My Profile", url: "/my-profile", icon: UserCircle },
-  { title: "Clock In/Out", url: "/attendance", icon: FileText },
+  { title: "My Timesheets", url: "/timesheet", icon: Clock },
   { title: "My Payslips", url: "/my-payslips", icon: Receipt },
-  { title: "Payment History", url: "/payment-history", icon: History },
   { title: "Chat", url: "/chat", icon: MessageSquare },
 ];
 
