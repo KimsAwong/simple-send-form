@@ -17,6 +17,7 @@ import PayrollHistory from "@/pages/PayrollHistory";
 import PayslipsPage from "@/pages/PayslipsPage";
 import PaymentHistoryPage from "@/pages/PaymentHistoryPage";
 import ProfilePage from "@/pages/ProfilePage";
+import TimesheetPage from "@/pages/TimesheetPage";
 import ChatPage from "@/pages/ChatPage";
 import CEOAnalytics from "@/pages/CEOAnalytics";
 import NotFound from "@/pages/NotFound";
@@ -106,6 +107,14 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <WithLayout><PayslipsPage /></WithLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/timesheet"
+                element={
+                  <ProtectedRoute>
+                    <WithLayout><TimesheetPage /></WithLayout>
                   </ProtectedRoute>
                 }
               />

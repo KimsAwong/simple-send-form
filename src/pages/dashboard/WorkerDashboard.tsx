@@ -1,27 +1,51 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Clock, FileText, DollarSign, ArrowRight, Loader2, User, ClipboardList, Info } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Clock, FileText, DollarSign, ArrowRight, User, ClipboardList, Info, Mail, Phone, MapPin, Calendar, Briefcase, Edit, Building, Loader2, Save, X, Shield, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTimesheets } from "@/hooks/useTimesheets";
 import { usePayslips } from "@/hooks/usePayslips";
 import { useWorkSummaries, getCurrentFortnightPeriod } from "@/hooks/useWorkSummaries";
+import { useProfile, useUpdateProfile, useBankDetails, useUpsertBankDetails } from "@/hooks/useProfile";
+import { useContracts } from "@/hooks/useContracts";
+import { useToast } from "@/hooks/use-toast";
+import { mapErrorToUserMessage } from "@/lib/error-utils";
+import { WorkSummarySection } from "@/components/workers/WorkSummarySection";
+import type { Database } from "@/integrations/supabase/types";
+
+// Sub-components
+import WorkerOverviewTab from "./worker/WorkerOverviewTab";
+import WorkerProfileTab from "./worker/WorkerProfileTab";
+import WorkerBankTab from "./worker/WorkerBankTab";
 
 export default function WorkerDashboard() {
-  const { user, primaryRole } = useAuth();
+  const { user, primaryRole, roles } = useAuth();
   const { data: timesheets, isLoading: loadingTimesheets } = useTimesheets();
   const { data: payslips } = usePayslips();
   const { data: summaries } = useWorkSummaries();
+  const { data: profileData, isLoading: loadingProfile } = useProfile();
+  type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
+  const profile = profileData as ProfileRow | null;
+  const { data: bankDetails } = useBankDetails();
+  const { data: contracts } = useContracts(user?.id);
+  const updateProfile = useUpdateProfile();
+  const upsertBank = useUpsertBankDetails();
+  const { toast } = useToast();
 
   const period = getCurrentFortnightPeriod();
   const hasSummaryThisPeriod = summaries?.some(
     (s: any) => s.period_start === period.start && s.period_end === period.end
   );
 
-  const currentDate = new Date().toLocaleDateString('en-US', { 
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
 
   const thisWeekHours = timesheets?.filter((t: any) => {
@@ -41,39 +65,38 @@ export default function WorkerDashboard() {
     return 'Good Evening';
   };
 
+  if (loadingProfile || !profile) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const initials = profile.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || '?';
+
   return (
     <div className="space-y-6">
+      {/* Header with avatar */}
       <div className="rounded-xl bg-gradient-primary p-6 text-primary-foreground">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="font-display text-2xl md:text-3xl font-bold">
-              {greeting()}, {user?.full_name?.split(' ')[0]}! 👋
-            </h1>
-            <p className="text-primary-foreground/80 mt-1">{currentDate}</p>
+          <div className="flex items-center gap-4">
+            <Avatar className="h-14 w-14 border-2 border-primary-foreground/30">
+              <AvatarImage src={profile.avatar_url || undefined} />
+              <AvatarFallback className="text-xl bg-primary-foreground/20 text-primary-foreground">{initials}</AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="font-display text-2xl md:text-3xl font-bold">
+                {greeting()}, {user?.full_name?.split(' ')[0]}! 👋
+              </h1>
+              <p className="text-primary-foreground/80 mt-1">{currentDate}</p>
+            </div>
           </div>
           <Badge className="bg-primary-foreground/20 text-primary-foreground border-0 gap-1 self-start">
             <User size={14} /> Worker
           </Badge>
         </div>
       </div>
-
-      {/* Role Description */}
-      <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="pt-6">
-          <div className="flex gap-3">
-            <Info className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-            <div className="text-sm text-muted-foreground space-y-1">
-              <p><strong>How it works:</strong></p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Your <strong>supervisor enters</strong> your daily clock-in and clock-out times — you cannot enter your own hours</li>
-                <li>Once approved, your <strong>payslip is automatically generated</strong> and can be downloaded as PDF</li>
-                <li>Every <strong>two weeks</strong>, you must submit a fortnightly work summary describing your tasks and site work</li>
-                <li>The summary resets at the start of each new fortnight (1st–15th and 16th–end of month)</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Fortnightly Summary Alert */}
       {!hasSummaryThisPeriod && (
@@ -89,133 +112,59 @@ export default function WorkerDashboard() {
                   </p>
                 </div>
               </div>
-              <Link to="/profile">
-                <Button size="sm" className="gap-1"><ClipboardList size={14} /> Submit Now</Button>
-              </Link>
+              <Button size="sm" className="gap-1" onClick={() => document.getElementById('tab-summaries')?.click()}>
+                <ClipboardList size={14} /> Submit Now
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hours This Week</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{thisWeekHours.toFixed(1)}</div>
-            <Progress value={(thisWeekHours / 40) * 100} className="mt-2" />
-            <p className="text-xs text-muted-foreground mt-1">of 40 hours target</p>
-          </CardContent>
-        </Card>
+      {/* Tabbed Content: Overview, Profile, Bank, Summaries */}
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="profile">My Profile</TabsTrigger>
+          <TabsTrigger value="bank">Bank Details</TabsTrigger>
+          <TabsTrigger value="summaries" id="tab-summaries">Work Summaries</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Latest Pay</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              K {latestPayslip ? Number(latestPayslip.net_pay).toLocaleString() : '0.00'}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {latestPayslip ? `${new Date(latestPayslip.period_start).toLocaleDateString()} period` : 'No payslips yet'}
-            </p>
-          </CardContent>
-        </Card>
+        <TabsContent value="overview">
+          <WorkerOverviewTab
+            thisWeekHours={thisWeekHours}
+            latestPayslip={latestPayslip}
+            timesheetCount={timesheets?.length || 0}
+            pendingCount={pendingCount}
+            user={user}
+            primaryRole={primaryRole}
+          />
+        </TabsContent>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Timesheets</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{timesheets?.length || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">All time entries</p>
-          </CardContent>
-        </Card>
+        <TabsContent value="profile">
+          <WorkerProfileTab
+            profile={profile}
+            roles={roles}
+            primaryRole={primaryRole}
+            user={user}
+            updateProfile={updateProfile}
+            timesheets={timesheets}
+            payslips={payslips}
+            contracts={contracts}
+          />
+        </TabsContent>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Clock className="h-4 w-4 text-warning" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pendingCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Awaiting approval</p>
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="bank">
+          <WorkerBankTab
+            bankDetails={bankDetails}
+            user={user}
+            upsertBank={upsertBank}
+          />
+        </TabsContent>
 
-      {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="card-hover">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Clock className="h-5 w-5 text-primary" />Timesheets
-            </CardTitle>
-            <CardDescription>View your work hours entered by your supervisor</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link to="/timesheet"><Button variant="outline" className="w-full gap-2">View Timesheets <ArrowRight size={14} /></Button></Link>
-          </CardContent>
-        </Card>
-
-        <Card className="card-hover">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <FileText className="h-5 w-5 text-primary" />Payslips
-            </CardTitle>
-            <CardDescription>
-              {latestPayslip ? `Latest: K ${Number(latestPayslip.net_pay).toLocaleString()}` : 'No payslips yet'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link to="/my-payslips"><Button variant="outline" className="w-full gap-2">View & Download <ArrowRight size={14} /></Button></Link>
-          </CardContent>
-        </Card>
-
-        <Card className="card-hover">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <User className="h-5 w-5 text-primary" />Profile
-            </CardTitle>
-            <CardDescription>View profile, bank details & submit summaries</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link to="/profile"><Button variant="outline" className="w-full gap-2">My Profile <ArrowRight size={14} /></Button></Link>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Employment Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Employment Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Position</p>
-              <p className="font-medium">{user?.position || '—'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Employment Type</p>
-              <Badge>{user?.employment_type || 'permanent'}</Badge>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Role</p>
-              <Badge variant="outline" className="capitalize">{primaryRole}</Badge>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Hourly Rate</p>
-              <p className="font-medium">K {Number(user?.hourly_rate || 0).toFixed(2)}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        <TabsContent value="summaries">
+          <WorkSummarySection showForm />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
