@@ -20,6 +20,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import TimesheetPage from "@/pages/TimesheetPage";
 import ChatPage from "@/pages/ChatPage";
 import CEOAnalytics from "@/pages/CEOAnalytics";
+import ContractsPage from "@/pages/ContractsPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -99,6 +100,14 @@ export default function App() {
                 element={
                   <ProtectedRoute allowedRoles={["ceo"]}>
                     <WithLayout><CEOAnalytics /></WithLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts"
+                element={
+                  <ProtectedRoute allowedRoles={["ceo", "supervisor"]}>
+                    <WithLayout><ContractsPage /></WithLayout>
                   </ProtectedRoute>
                 }
               />
