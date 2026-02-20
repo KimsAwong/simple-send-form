@@ -39,10 +39,8 @@ const financeNav = [
 ];
 
 const supervisorNav = [
-  { title: "Supervisor Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "My Team", url: "/workers", icon: Users },
-  { title: "Attendance Approvals", url: "/supervisor-attendance", icon: FileText },
-  { title: "My Attendance", url: "/attendance", icon: History },
+  { title: "My Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Contracts", url: "/contracts", icon: FileText },
   { title: "Chat", url: "/chat", icon: MessageSquare },
 ];
 
